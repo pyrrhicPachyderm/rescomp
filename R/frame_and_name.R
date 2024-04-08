@@ -18,9 +18,9 @@ frame_and_name <- function(model) {
   pars <- model[[2]]
   frameddf <- as.data.frame(odeobject)
   names(frameddf)[-1] <- c(paste0("N",
-                                  1:pars$nconsumers),
+                                  1:pars$spnum),
                            paste0("R",
                                   letters[c(1:((ncol(frameddf)) -
-                                                      (pars$nconsumers + 1)))]))
+                                                      (pars$spnum + 1)))]))
   return(frameddf)
 }
