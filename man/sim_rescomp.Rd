@@ -5,11 +5,14 @@
 \title{Simulate resource competition (a convenience wrapper for
 \code{deSolve::ode()})}
 \usage{
-sim_rescomp(pars, totaltime, cinit, rinit, ...)
+sim_rescomp(pars, stochastic = FALSE, totaltime, cinit, rinit, ...)
 }
 \arguments{
 \item{pars}{S3 object of class \code{rescomp} returned by
 \code{rescomp::spec_rescomp()}.}
+
+\item{stochastic}{A boolean. If TRUE, use stochastic simulation,
+via tau leaping instead of differential equations.}
 
 \item{totaltime}{Numeric vector of length 1: the total simulation time.
 If provided, overrides the value in \code{pars}.}

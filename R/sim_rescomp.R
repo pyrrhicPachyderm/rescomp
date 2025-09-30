@@ -3,6 +3,8 @@
 #'
 #' @param pars S3 object of class `rescomp` returned by
 #'     `rescomp::spec_rescomp()`.
+#' @param stochastic A boolean. If TRUE, use stochastic simulation,
+#'     via tau leaping instead of differential equations.
 #' @param totaltime Numeric vector of length 1: the total simulation time.
 #'     If provided, overrides the value in `pars`.
 #' @param cinit Numeric vector of length 1 or length `spnum` specifying
@@ -20,7 +22,7 @@
 #' @examples
 #' pars <- spec_rescomp()
 #' sim_rescomp(pars = pars)
-sim_rescomp <- function(pars, totaltime, cinit, rinit, ...) {
+sim_rescomp <- function(pars, stochastic = FALSE, totaltime, cinit, rinit, ...) {
   # TODO: For parameters that override the values in `pars`, error-check them the same as spec_rescomp().
   # Write helper functions for error-checking that can be called both here and in spec_rescomp().
   if (!missing(totaltime)) {
@@ -37,27 +39,42 @@ sim_rescomp <- function(pars, totaltime, cinit, rinit, ...) {
   }
 
   pars$event_schedule_df <- prepare_event_schedule_df(pars$events, pars$totaltime)
-
-  times <- seq(0, pars$totaltime, by = 0.1) # TODO: Make step size customisable.
   y <- c(pars$cinit, pars$rinit)
 
-  if (nrow(pars$event_schedule_df) > 0) {
-    events <- list(
-      func = ode_event_func,
-      time = pars$event_schedule_df$time
+  if (!stochastic) {
+    times <- seq(0, pars$totaltime, by = 0.1) # TODO: Make step size customisable.
+
+    if (nrow(pars$event_schedule_df) > 0) {
+      events <- list(
+        func = ode_event_func,
+        time = pars$event_schedule_df$time
+      )
+    } else {
+      events <- list()
+    }
+
+    mod <- deSolve::ode(
+      func = def_cr_ode,
+      y = y,
+      parms = pars,
+      times = times,
+      events = events,
+      ...
     )
   } else {
-    events <- list()
-  }
+    # TODO: Handle events.
+    pars$stochastic_sim_start_t <- 0
 
-  mod <- deSolve::ode(
-    func = def_cr_ode,
-    y = y,
-    parms = pars,
-    times = times,
-    events = events,
-    ...
-  )
+    mod <- adaptivetau::ssa.adaptivetau(
+      init.values = y,
+      transitions = def_cr_transitions(pars),
+      rateFunc = def_cr_transition_rates,
+      params = pars,
+      tf = pars$totaltime
+    )
+
+    pars$stochastic_sim_start_t <- NULL # This existed only for computation, and should not be returned to the user.
+  }
 
   out <- list(mod, pars[])
   return(out)

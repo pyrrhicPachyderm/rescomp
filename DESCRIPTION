@@ -32,6 +32,7 @@ Imports:
     ggplot2,
     tidyr,
     deSolve,
+    adaptivetau,
     rlang,
     stats,
     cli,
