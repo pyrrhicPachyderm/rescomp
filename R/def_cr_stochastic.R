@@ -99,7 +99,7 @@ def_cr_transitions <- function(pars) {
 def_cr_transition_rates <- function(y, pars, t) {
   t <- t + pars$stochastic_sim_start_t # TODO: Set this in sim_rescomp().
 
-  # TODO: The next ~15-17 lines are copied directly from def_cr_ode(); functionalise to reduce code duplication.
+  # TODO: The next ~13-15 lines are copied directly from def_cr_ode(); functionalise to reduce code duplication.
   N <- y[1:pars$spnum]
   R <- y[-(1:pars$spnum)]
   params <- get_params(pars$params, t)
@@ -107,11 +107,9 @@ def_cr_transition_rates <- function(y, pars, t) {
   mu <- get_funcresp(pars$funcresp, pars$spnum, R, params)
   ressupply <- get_ressupply(pars$ressupply, R, params)
   if (is.null(pars$efficiency)) {
-    quota <- get_coefs_matrix(pars$quota, params)
     efficiency <- 1
   } else {
     efficiency <- get_coefs_matrix(pars$efficiency, params)
-    quota <- 1 / efficiency
   }
   mort <- get_coefs_vector(pars$mort, params)
 
