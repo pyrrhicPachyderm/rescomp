@@ -79,3 +79,49 @@ def_cr_transitions <- function(pars) {
 
   return(c(growth, death, ressupply))
 }
+
+# TODO: We have an additional problem with the use of adaptivetau.
+# Namely, all simulations begin at t = 0.
+# Given that we will need to start and stop simulations, this means it does not function in the presence of non-autonomous behaviour.
+# We can temporarily fix this by storing the start time in pars, and adding it to t.
+
+#' Get the rates of transitions for a Gillespie algorithm simulation
+#'
+#' @param y The vector of current estimates of consumers and resources in the simulation.
+#' @param pars The `rescomp` object passed to `sim_rescomp()`.
+#' @param pars The current time of the simulation.
+#'
+#' @return A vector of rates of each of the transitions produced by `def_cr_transitions()`.
+#' @export
+#'
+#' @examples
+#' # TODO
+def_cr_transition_rates <- function(y, pars, t) {
+  t <- t + pars$stochastic_sim_start_t # TODO: Set this in sim_rescomp().
+
+  # TODO: The next ~15-17 lines are copied directly from def_cr_ode(); functionalise to reduce code duplication.
+  N <- y[1:pars$spnum]
+  R <- y[-(1:pars$spnum)]
+  params <- get_params(pars$params, t)
+
+  mu <- get_funcresp(pars$funcresp, pars$spnum, R, params)
+  ressupply <- get_ressupply(pars$ressupply, R, params)
+  if (is.null(pars$efficiency)) {
+    quota <- get_coefs_matrix(pars$quota, params)
+    efficiency <- 1
+  } else {
+    efficiency <- get_coefs_matrix(pars$efficiency, params)
+    quota <- 1 / efficiency
+  }
+  mort <- get_coefs_vector(pars$mort, params)
+
+  growth <- mu * N * efficiency
+  death <- mort * N
+  if (pars$essential) {
+    growth <- apply(growth, 1, min)
+  } else {
+    growth <- as.vector(t(growth))
+  }
+
+  return(c(growth, death, ressupply))
+}
