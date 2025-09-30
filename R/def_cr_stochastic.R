@@ -46,7 +46,7 @@ def_cr_transitions <- function(pars) {
   if (pars$essential) {
     growth <- lapply(1:pars$spnum, function(i) {
       names <- c(sp_indices[i], res_indices)
-      values <- c(1, quota)
+      values <- c(1, -1 * quota)
       return(setNames(values, names))
     })
   } else {
@@ -55,7 +55,7 @@ def_cr_transitions <- function(pars) {
       lapply(1:pars$spnum, function(i) {
         lapply(1:pars$resnum, function(j) {
           names <- c(sp_indices[i], res_indices[j])
-          values <- c(1, quota[j])
+          values <- c(1, -1 * quota[j])
           return(setNames(values, names))
         })
       })
