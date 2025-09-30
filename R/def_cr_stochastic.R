@@ -136,6 +136,10 @@ def_cr_transition_rates <- function(y, pars, t) {
 run_ssa <- function(y, pars, start_time, run_time) {
   pars$stochastic_sim_start_t <- start_time
 
+  # Give y names to avoid a stack imbalance warning.
+  # This circumvents a bug in adaptivetau; see https://github.com/plfjohnson/adaptivetau/issues/1
+  names(y) <- c(paste0("sp", 1:pars$spnum), paste0("res", 1:pars$resnum))
+
   mod <- adaptivetau::ssa.adaptivetau(
     init.values = y,
     transitions = def_cr_transitions(pars),
