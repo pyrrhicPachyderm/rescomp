@@ -62,8 +62,27 @@ sim_rescomp <- function(pars, stochastic = FALSE, totaltime, cinit, rinit, ...) 
       ...
     )
   } else {
-    # TODO: Handle events.
-    mod <- run_ssa(y, pars, start_time = 0, run_time = pars$totaltime)
+    # Initial "run", will always produce one row, just to initialise matrix.
+    mod <- run_ssa(y, pars, start_time = 0, run_time = 0)
+    t <- 0
+
+    if (nrow(pars$event_schedule_df) > 0) {
+      for (i in 1:nrow(pars$event_schedule_df)) {
+        time <- pars$event_schedule_df$time[i]
+        event_index <- pars$event_schedule_df$event_index[i]
+
+        new_mod <- run_ssa(y, pars, start_time = t, run_time = time - t)
+        mod <- rbind(mod[-nrow(mod), ], new_mod) # Cut off the last row of mod, as it is redundant with the first row of new_mod.
+
+        t <- time
+        y <- as.vector(mod[nrow(mod), -1])
+        y <- apply_event(pars$events[[event_index]]$event_obj, y[1:pars$spnum], y[-(1:pars$spnum)], get_params(pars$params, t), t)
+      }
+    }
+
+    # Final run, after all events.
+    new_mod <- run_ssa(y, pars, start_time = t, run_time = pars$totaltime - t)
+    mod <- rbind(mod[-nrow(mod), ], new_mod)
   }
 
   out <- list(mod, pars[])
