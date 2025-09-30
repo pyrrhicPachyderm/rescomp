@@ -123,3 +123,30 @@ def_cr_transition_rates <- function(y, pars, t) {
 
   return(c(growth, death, ressupply))
 }
+
+#' Run a tau-leaping simulation, adjusting times appropriately.
+#'
+#' @param y A vector of initial values for the consumer and resource concentrations.
+#' @param pars The `rescomp` object passed to `sim_rescomp()`.
+#' @param start_time A numeric vector of length 1; the time to start the simulation.
+#' @param run_time A numeric vector of length 1; the period of time for which to run the simulation.
+#'
+#' @return A matrix in the format of the return value of adaptivetau::ssa.adaptivetau, but with the time column adjusted for the non-zero start time.
+#' @noRd
+run_ssa <- function(y, pars, start_time, run_time) {
+  pars$stochastic_sim_start_t <- start_time
+
+  mod <- adaptivetau::ssa.adaptivetau(
+    init.values = y,
+    transitions = def_cr_transitions(pars),
+    rateFunc = def_cr_transition_rates,
+    params = pars,
+    tf = run_time
+  )
+
+  pars$stochastic_sim_start_t <- NULL # This existed only for computation, and should not be returned to the user.
+
+  mod[, 1] <- mod[, 1] + start_time
+
+  return(mod)
+}

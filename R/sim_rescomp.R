@@ -63,17 +63,7 @@ sim_rescomp <- function(pars, stochastic = FALSE, totaltime, cinit, rinit, ...) 
     )
   } else {
     # TODO: Handle events.
-    pars$stochastic_sim_start_t <- 0
-
-    mod <- adaptivetau::ssa.adaptivetau(
-      init.values = y,
-      transitions = def_cr_transitions(pars),
-      rateFunc = def_cr_transition_rates,
-      params = pars,
-      tf = pars$totaltime
-    )
-
-    pars$stochastic_sim_start_t <- NULL # This existed only for computation, and should not be returned to the user.
+    mod <- run_ssa(y, pars, start_time = 0, run_time = pars$totaltime)
   }
 
   out <- list(mod, pars[])
