@@ -3,6 +3,7 @@
 # - Consumer death
 # - Resource supply
 # - Resource depletion
+# - Extra terms
 
 # If resources are essential, each consumer has a single growth transition, taking a dose of all resources.
 # If resources are substitutable, each consumer has one growth transition per resource.
@@ -77,7 +78,13 @@ def_cr_transitions <- function(pars) {
   # TODO: It will be necessary to split ressupply into an addition and subtraction component, as the Gillespie algorithm does not allow for negative rates of positive transitions.
   # This can't be done here alone; this will require a fundamental change to the ressupply logic.
 
-  return(c(growth, death, ressupply))
+  extra_terms <- lapply(pars$extra_terms, function(extra_term) {
+    names <- c(sp_indices, res_indices)
+    values <- c(extra_term$consumers, extra_term$resources)
+    return(setNames(values, names))
+  })
+
+  return(c(growth, death, ressupply, extra_terms))
 }
 
 # TODO: We have an additional problem with the use of adaptivetau.
@@ -117,11 +124,18 @@ def_cr_transition_rates <- function(y, pars, t) {
   death <- mort * N
   if (pars$essential) {
     growth <- apply(growth, 1, min)
+    total_growth <- growth
   } else {
+    total_growth <- rowSums(growth)
     growth <- as.vector(t(growth))
   }
 
-  return(c(growth, death, ressupply))
+  total_growth
+  extra_terms <- unlist(lapply(pars$extra_terms, function(extra_term) {
+    return(extra_term$rate(N, R, total_growth))
+  }))
+
+  return(c(growth, death, ressupply, extra_terms))
 }
 
 #' Run a tau-leaping simulation, adjusting times appropriately.

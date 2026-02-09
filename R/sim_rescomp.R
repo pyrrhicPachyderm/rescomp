@@ -53,6 +53,10 @@ sim_rescomp <- function(pars, stochastic = FALSE, totaltime, cinit, rinit, ...) 
       events <- list()
     }
 
+    if (length(pars$extra_terms) > 0) {
+      cli::cli_abort("The {.arg extra_terms} argument is not currently supported for non-stochastic simulation.")
+    }
+
     mod <- deSolve::ode(
       func = def_cr_ode,
       y = y,

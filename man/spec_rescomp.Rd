@@ -16,6 +16,7 @@ spec_rescomp(
   ressupply = ressupply_chemostat(0.03, 1),
   params = rescomp_param_list(),
   events = list(),
+  extra_terms = list(),
   totaltime = 1000,
   cinit = 10,
   rinit = 1,
@@ -51,6 +52,15 @@ with time, on which other parameters of the model (e.g. funcresp, ressupply) may
 
 \item{events}{A list of objects of class \code{rescomp_event_schedule}, specifying events that
 instantaneously change consumer or resource densities.}
+
+\item{extra_terms}{A list of lists. Each list details a set of extra terms
+that should be grouped as a single transition if using stochastic simulation.
+Each inner list must three arguments: \code{consumers}, \code{resources}, and \code{rate}.
+\code{consumers} and \code{resources} are vectors of length \code{spnum} and \code{resnum} respectively,
+specifying the size of the change to the corresponding variables from the transition.
+\code{rate} is a function returning the rate of the transition.
+Rate functions take three arguments: a vector of consumer concentrations,
+a vector of resource concentrations, a vector of total growth rates of each consumer.}
 
 \item{totaltime}{Numeric vector of length 1: the total simulation time.}
 

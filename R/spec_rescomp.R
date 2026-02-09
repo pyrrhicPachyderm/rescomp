@@ -20,6 +20,14 @@
 #'     with time, on which other parameters of the model (e.g. funcresp, ressupply) may depend.
 #' @param events A list of objects of class `rescomp_event_schedule`, specifying events that
 #'     instantaneously change consumer or resource densities.
+#' @param extra_terms A list of lists. Each list details a set of extra terms
+#'     that should be grouped as a single transition if using stochastic simulation.
+#'     Each inner list must three arguments: `consumers`, `resources`, and `rate`.
+#'     `consumers` and `resources` are vectors of length `spnum` and `resnum` respectively,
+#'     specifying the size of the change to the corresponding variables from the transition.
+#'     `rate` is a function returning the rate of the transition.
+#'     Rate functions take three arguments: a vector of consumer concentrations,
+#'     a vector of resource concentrations, a vector of total growth rates of each consumer.
 #' @param totaltime Numeric vector of length 1: the total simulation time.
 #' @param cinit Numeric vector of length 1 or length `spnum` specifying
 #'     initial consumer state values (densities).
@@ -72,6 +80,7 @@ spec_rescomp <- function(spnum = 1,
                          ressupply = ressupply_chemostat(0.03, 1),
                          params = rescomp_param_list(),
                          events = list(),
+                         extra_terms = list(),
                          totaltime = 1000,
                          cinit = 10,
                          rinit = 1,
@@ -100,6 +109,7 @@ spec_rescomp <- function(spnum = 1,
     ressupply = ressupply,
     params = params,
     events = events,
+    extra_terms = extra_terms,
     totaltime = totaltime,
     cinit = cinit,
     rinit = rinit
