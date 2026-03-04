@@ -17,7 +17,7 @@ Authors@R:
            role = c("aut"),
            email = "a.letten@uq.edu.au",
            comment = c(ORCID = "0000-0001-6436-7942")))
-URL: https://github.com/pyrrhicpachyderm/rescomp, https://andrewletten.net/
+URL: https://github.com/pyrrhicpachyderm/rescomp
 Description: Generate, simulate and visualise ODE models of consumer-resource 
     interactions. At its core, rescomp provides a resource competition 
     modelling focused interface to deSolve, alongside flexible functions for 
