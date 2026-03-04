@@ -10,7 +10,7 @@
 <!-- badges: end -->
 
 *rescomp* is an R package that supports the definition, simulation and
-visualization of ODE models of ecological consumer-resource
+visualisation of ODE models of ecological consumer-resource
 interactions. In essence, it is a consumer-resource modelling focused
 interface to the excellent *deSolve* package.
 

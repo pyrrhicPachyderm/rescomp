@@ -21,7 +21,7 @@ URL: https://github.com/pyrrhicpachyderm/rescomp
 Description: Generate, simulate and visualise ODE models of consumer-resource 
     interactions. At its core, rescomp provides a resource competition 
     modelling focused interface to deSolve, alongside flexible functions for 
-    visualizing model properties and dynamics. More information, documention 
+    visualising model properties and dynamics. More information, documention 
     and examples can be found on the package website.
 License: MIT + file LICENSE
 Encoding: UTF-8
