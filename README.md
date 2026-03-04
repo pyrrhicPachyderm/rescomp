@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/andrewletten/rescomp/workflows/R-CMD-check/badge.svg)](https://github.com/andrewletten/rescomp/actions)
+[![R-CMD-check](https://github.com/pyrrhicpachyderm/rescomp/workflows/R-CMD-check/badge.svg)](https://github.com/pyrrhicpachyderm/rescomp/actions)
 
 <!-- badges: end -->
 
@@ -20,7 +20,7 @@ You can install *rescomp* from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("andrewletten/rescomp")
+devtools::install_github("pyrrhicpachyderm/rescomp")
 ```
 
 ## Example
