@@ -99,6 +99,7 @@ plot_rescomp(sim_rescomp(m2))
 # With serial dilution (batch transfer) events.
 m3 <- spec_rescomp(
   ressupply = ressupply_constant(0),
+  mort = 0,
   events = list(
     event_schedule_periodic(
       event_batch_transfer(dilution = 0.1, resources = 1),
