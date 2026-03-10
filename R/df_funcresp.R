@@ -101,7 +101,7 @@ df_funcresp <- function(pars, maxx = 1, display_values, madj = FALSE, call = rla
 
   df <- expand.grid(c(list(x = resource_levels), param_display_values))
 
-  ys <- cbind(
+  ys_wide <- cbind(
     data.frame(sp = rep(seq_len(pars$spnum), times = nrow(df))),
     stats::setNames(
       as.data.frame(do.call(rbind, lapply(seq_len(nrow(df)), function(i) {
@@ -109,8 +109,8 @@ df_funcresp <- function(pars, maxx = 1, display_values, madj = FALSE, call = rla
       }))),
       seq_len(pars$resnum)
     )
-  ) |>
-    tidyr::pivot_longer(-"sp", names_to = "res", names_transform = list(res = as.integer), values_to = "y")
+  )
+  ys <- tidyr::pivot_longer(ys_wide, -"sp", names_to = "res", names_transform = list(res = as.integer), values_to = "y")
 
   df <- cbind(
     df[rep(seq_len(nrow(df)), each = pars$spnum * pars$resnum), , drop = FALSE],
