@@ -92,7 +92,8 @@ m2 <- spec_rescomp(
       0.15, 0.15
     ),
     h = crmatrix(1)
-  )
+  ),
+  totaltime = 500
 )
 plot_rescomp(sim_rescomp(m2))
 
@@ -103,9 +104,10 @@ m3 <- spec_rescomp(
   events = list(
     event_schedule_periodic(
       event_batch_transfer(dilution = 0.1, resources = 1),
-      period = 250
+      period = 125
     )
-  )
+  ),
+  totaltime = 500
 )
 plot_rescomp(sim_rescomp(m3))
 
@@ -119,7 +121,8 @@ m4 <- spec_rescomp(
       param_name = "temperature"
     )
   ),
-  params = list(temperature = rescomp_param_sine(period = 250))
+  params = list(temperature = rescomp_param_sine(period = 125)),
+  totaltime = 500
 )
 plot_rescomp(sim_rescomp(m4))
 }
