@@ -5,12 +5,12 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/andrewletten/rescomp/workflows/R-CMD-check/badge.svg)](https://github.com/andrewletten/rescomp/actions)
+[![R-CMD-check](https://github.com/pyrrhicpachyderm/rescomp/workflows/R-CMD-check/badge.svg)](https://github.com/pyrrhicpachyderm/rescomp/actions)
 
 <!-- badges: end -->
 
 *rescomp* is an R package that supports the definition, simulation and
-visualization of ODE models of ecological consumer-resource
+visualisation of ODE models of ecological consumer-resource
 interactions. In essence, it is a consumer-resource modelling focused
 interface to the excellent *deSolve* package.
 
@@ -20,7 +20,7 @@ You can install *rescomp* from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("andrewletten/rescomp")
+devtools::install_github("pyrrhicpachyderm/rescomp")
 ```
 
 ## Example
@@ -72,13 +72,13 @@ The main utility of *rescomp* comes with specifying more elaborate
 models and simulation dynamics. Features/options include (but are not
 limited to):
 
-  - Unlimited number of consumers/resources
-  - Consumer functional response (type I, II or III)
-  - Resource dynamic (chemostat, logistic and/or pulsed)
-  - Resource type (substitutable or essential)
-  - Continuous or intermittent mortality (e.g. serial transfer)
-  - Time dependent growth and consumption parameters
-  - Delayed consumer introduction times
+- Unlimited number of consumers/resources
+- Consumer functional response (type I, II or III)
+- Resource dynamic (chemostat, logistic and/or pulsed)
+- Resource type (substitutable or essential)
+- Continuous or intermittent mortality (e.g. serial transfer)
+- Time dependent growth and consumption parameters
+- Delayed consumer introduction times
 
 See `?spec_rescomp` for all argument options.
 
@@ -142,7 +142,7 @@ pars <- spec_rescomp(
     ks = crmatrix(1),
     n = crmatrix(2)
   ),
-  params = rescomp_param_list(
+  params = list(
     env_state = rescomp_param_square(period = 80)
   ),
   ressupply = ressupply_constant(0),

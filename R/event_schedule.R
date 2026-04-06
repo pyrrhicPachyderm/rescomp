@@ -10,7 +10,19 @@
 #' @export
 #'
 #' @examples
-#' # TODO
+#' m1 <- spec_rescomp(
+#'   events = list(
+#'     event_schedule_fixed(
+#'       event_res_add(0.5),
+#'       times = c(200, 400)
+#'     ),
+#'     event_schedule_fixed(
+#'       event_sp_add(-500),
+#'       times = c(600, 800)
+#'     )
+#'   )
+#' )
+#' plot_rescomp(sim_rescomp(m1))
 event_schedule_fixed <- function(event_obj, times, priority = 0) {
   schedule <- list(event_obj = event_obj, times = times, priority = priority)
   class(schedule) <- c("rescomp_event_schedule_fixed", "rescomp_event_schedule")
@@ -30,7 +42,20 @@ event_schedule_fixed <- function(event_obj, times, priority = 0) {
 #' @export
 #'
 #' @examples
-#' # TODO
+#' m1 <- spec_rescomp(
+#'   events = list(
+#'     event_schedule_periodic(
+#'       event_batch_transfer(dilution = 0.1, resources = 1),
+#'       period = 250
+#'     ),
+#'     event_schedule_periodic(
+#'       event_batch_transfer(dilution = 0.5, resources = 1),
+#'       period = 250,
+#'       start_time = 125
+#'     )
+#'   )
+#' )
+#' plot_rescomp(sim_rescomp(m1))
 event_schedule_periodic <- function(event_obj, period, start_time = period, priority = 0) {
   schedule <- list(event_obj = event_obj, period = period, start_time = start_time, priority = priority)
   class(schedule) <- c("rescomp_event_schedule_periodic", "rescomp_event_schedule")
@@ -39,7 +64,7 @@ event_schedule_periodic <- function(event_obj, period, start_time = period, prio
 
 #' Gets the list of times from a `rescomp_event_schedule` object
 #'
-#' This function is normally only for internal use, but is exported to aid users in debugging their created `rescomp_event` objects.
+#' This function is normally only for internal use, but is exported to aid users in debugging their created `rescomp_event_schedule` objects.
 #'
 #' @param event_schedule_obj An object of class `rescomp_event_schedule`.
 #' @param totaltime The total time which the simulation will run for.
@@ -48,7 +73,20 @@ event_schedule_periodic <- function(event_obj, period, start_time = period, prio
 #' @export
 #'
 #' @examples
-#' # TODO
+#' schedule1 <- event_schedule_periodic(
+#'   event_batch_transfer(dilution = 0.1, resources = 1),
+#'   period = 250
+#' )
+#' get_event_times(schedule1, 1000)
+#' get_event_times(schedule1, 999)
+#'
+#' schedule2 <- event_schedule_periodic(
+#'   event_batch_transfer(dilution = 0.1, resources = 1),
+#'   period = 250,
+#'   start_time = 125
+#' )
+#' get_event_times(schedule2, 1000)
+#' get_event_times(schedule2, 999)
 get_event_times <- function(event_schedule_obj, totaltime) {
   UseMethod("get_event_times")
 }

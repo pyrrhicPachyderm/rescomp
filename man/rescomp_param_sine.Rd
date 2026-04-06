@@ -6,11 +6,29 @@
 \alias{rescomp_param_square}
 \title{Create a rescomp parameter using a sine/square/triangle wave}
 \usage{
-rescomp_param_sine(period = 1, min = 0, max = 1, offset = 0)
+rescomp_param_sine(
+  period = 1,
+  min = 0,
+  max = 1,
+  offset = 0,
+  display_values = c(min, max)
+)
 
-rescomp_param_triangle(period = 1, min = 0, max = 1, offset = 0)
+rescomp_param_triangle(
+  period = 1,
+  min = 0,
+  max = 1,
+  offset = 0,
+  display_values = c(min, max)
+)
 
-rescomp_param_square(period = 1, min = 0, max = 1, offset = 0)
+rescomp_param_square(
+  period = 1,
+  min = 0,
+  max = 1,
+  offset = 0,
+  display_values = c(min, max)
+)
 }
 \arguments{
 \item{period}{The period of the wave.}
@@ -27,9 +45,18 @@ rescomp_param_square(period = 1, min = 0, max = 1, offset = 0)
 S3 object of class \code{rescomp_param}.
 }
 \description{
-Produces an object suitable to include in a \code{rescomp_param_list}.
+Produces an object suitable to include in a list of rescomp parameters, providing time-dependence.
 Triangle and square waves are phase-shifted to be similiar in shape to a sine wave with the same period and offset, such that the peaks and troughs occur in the same places.
 }
 \examples{
-# TODO
+sine <- rescomp_param_sine(period = 1)
+cosine <- rescomp_param_sine(period = 1, offset = -0.25)
+triangle <- rescomp_param_triangle(period = 1)
+square <- rescomp_param_square(period = 1)
+
+times <- seq(from = 0, to = 2, by = 0.01)
+plot(times, get_params(sine, times), type = "l", col = "black")
+lines(times, get_params(cosine, times), col = "blue")
+lines(times, get_params(triangle, times), col = "maroon3")
+lines(times, get_params(square, times), col = "orange")
 }

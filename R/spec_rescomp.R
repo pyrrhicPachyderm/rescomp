@@ -16,8 +16,10 @@
 #' @param mort Numeric vector or `rescomp_coefs_vector` of length `spnum`,
 #'     specifying density independent mortality rates.
 #' @param ressupply An object of class `rescomp_ressupply` specifying the resource supply.
-#' @param params An object of class `rescomp_param_list` specifying a set of parameters which vary
-#'     with time, on which other parameters of the model (e.g. funcresp, ressupply) may depend.
+#' @param params A list specifying a set of parameters which may vary with time,
+#'     on which other parameters of the model (e.g. funcresp, ressupply) may depend.
+#'     `rescomp_param` objects in the list are parsed to allow time dependence,
+#'     while other objects are passed directly.
 #' @param events A list of objects of class `rescomp_event_schedule`, specifying events that
 #'     instantaneously change consumer or resource densities.
 #' @param extra_terms A list of lists. Each list details a set of extra terms
@@ -45,31 +47,53 @@
 #' @export
 #'
 #' @examples
+#' # Using default parameters.
 #' m1 <- spec_rescomp()
 #' plot_rescomp(sim_rescomp(m1))
 #'
+#' # With two species, two resources, and type 2 functional responses.
 #' m2 <- spec_rescomp(
 #'   spnum = 2,
 #'   resnum = 2,
-#'   funcresp = funcresp_type1(
+#'   funcresp = funcresp_type2(
 #'     a = crmatrix(
 #'       0.1, 0.2,
 #'       0.15, 0.15
-#'     )
-#'   )
+#'     ),
+#'     h = crmatrix(1)
+#'   ),
+#'   totaltime = 500
 #' )
 #' plot_rescomp(sim_rescomp(m2))
 #'
+#' # With serial dilution (batch transfer) events.
 #' m3 <- spec_rescomp(
 #'   ressupply = ressupply_constant(0),
+#'   mort = 0,
 #'   events = list(
 #'     event_schedule_periodic(
 #'       event_batch_transfer(dilution = 0.1, resources = 1),
-#'       period = 250
+#'       period = 125
 #'     )
-#'   )
+#'   ),
+#'   totaltime = 500
 #' )
 #' plot_rescomp(sim_rescomp(m3))
+#'
+#' # Growth rates affected by seasonal temperature fluctuations.
+#' m4 <- spec_rescomp(
+#'   spnum = 2,
+#'   funcresp = funcresp_type1(
+#'     a = rescomp_coefs_lerp(
+#'       crmatrix(0.12, 0.08),
+#'       crmatrix(0.08, 0.12),
+#'       param_name = "temperature"
+#'     )
+#'   ),
+#'   params = list(temperature = rescomp_param_sine(period = 125)),
+#'   totaltime = 500
+#' )
+#' plot_rescomp(sim_rescomp(m4))
 spec_rescomp <- function(spnum = 1,
                          resnum = 1,
                          funcresp = funcresp_type1(crmatrix(0.1)),
@@ -78,7 +102,7 @@ spec_rescomp <- function(spnum = 1,
                          essential = FALSE,
                          mort = 0.03,
                          ressupply = ressupply_chemostat(0.03, 1),
-                         params = rescomp_param_list(),
+                         params = list(),
                          events = list(),
                          extra_terms = list(),
                          totaltime = 1000,

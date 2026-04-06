@@ -26,7 +26,28 @@ get_resource_names <- function(indices) {
 #' @noRd
 #'
 #' @examples
-#' # TODO
+#' pars <- spec_rescomp(
+#'   spnum = 2,
+#'   funcresp = funcresp_type1(
+#'     a = rescomp_coefs_lerp(
+#'       crmatrix(0.12, 0.08),
+#'       crmatrix(0.08, 0.12),
+#'       param_name = "temperature"
+#'     )
+#'   ),
+#'   quota = rescomp_coefs_lerp(
+#'     crmatrix(0.0014),
+#'     crmatrix(0.0006),
+#'     param_name = "rot"
+#'   ),
+#'   params = list(
+#'     temperature = rescomp_param_sine(period = 250),
+#'     rot = rescomp_param_sine(period = 250, offset = -50)
+#'   )
+#' )
+#' process_display_values(pars)
+#' process_display_values(pars, display_values = list(temperature = c(0.0, 0.25, 0.5, 0.75, 1.0)))
+#' process_display_values(pars, display_values = list(temperature = 0.5, rot = 0.5))
 process_display_values <- function(pars, display_values, call = rlang::caller_env()) {
   param_display_values <- lapply(pars$params, get_display_values)
 
@@ -80,16 +101,16 @@ df_funcresp <- function(pars, maxx = 1, display_values, madj = FALSE, call = rla
 
   df <- expand.grid(c(list(x = resource_levels), param_display_values))
 
-  ys <- cbind(
+  ys_wide <- cbind(
     data.frame(sp = rep(seq_len(pars$spnum), times = nrow(df))),
-    setNames(
+    stats::setNames(
       as.data.frame(do.call(rbind, lapply(seq_len(nrow(df)), function(i) {
         get_funcresp(pars$funcresp, pars$spnum, rep(df[i, 1, drop = TRUE], times = pars$resnum), as.list(df[i, -1, drop = FALSE]))
       }))),
       seq_len(pars$resnum)
     )
-  ) |>
-    tidyr::pivot_longer(-sp, names_to = "res", names_transform = list(res = as.integer), values_to = "y")
+  )
+  ys <- tidyr::pivot_longer(ys_wide, -"sp", names_to = "res", names_transform = list(res = as.integer), values_to = "y")
 
   df <- cbind(
     df[rep(seq_len(nrow(df)), each = pars$spnum * pars$resnum), , drop = FALSE],

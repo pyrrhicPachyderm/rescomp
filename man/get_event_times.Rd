@@ -15,8 +15,21 @@ get_event_times(event_schedule_obj, totaltime)
 A vector of times.
 }
 \description{
-This function is normally only for internal use, but is exported to aid users in debugging their created \code{rescomp_event} objects.
+This function is normally only for internal use, but is exported to aid users in debugging their created \code{rescomp_event_schedule} objects.
 }
 \examples{
-# TODO
+schedule1 <- event_schedule_periodic(
+  event_batch_transfer(dilution = 0.1, resources = 1),
+  period = 250
+)
+get_event_times(schedule1, 1000)
+get_event_times(schedule1, 999)
+
+schedule2 <- event_schedule_periodic(
+  event_batch_transfer(dilution = 0.1, resources = 1),
+  period = 250,
+  start_time = 125
+)
+get_event_times(schedule2, 1000)
+get_event_times(schedule2, 999)
 }

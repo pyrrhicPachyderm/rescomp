@@ -18,11 +18,11 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/andrewletten/rescomp/workflows/R-CMD-check/badge.svg)](https://github.com/andrewletten/rescomp/actions)
+[![R-CMD-check](https://github.com/pyrrhicpachyderm/rescomp/workflows/R-CMD-check/badge.svg)](https://github.com/pyrrhicpachyderm/rescomp/actions)
 
 <!-- badges: end -->
 
-*rescomp* is an R package that supports the definition, simulation and visualization of ODE models of ecological consumer-resource interactions. In essence, it is a consumer-resource modelling focused interface to the excellent *deSolve* package.
+*rescomp* is an R package that supports the definition, simulation and visualisation of ODE models of ecological consumer-resource interactions. In essence, it is a consumer-resource modelling focused interface to the excellent *deSolve* package.
 
 ## Installation
 
@@ -30,7 +30,7 @@ You can install *rescomp* from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("andrewletten/rescomp")
+devtools::install_github("pyrrhicpachyderm/rescomp")
 ```
 
 ## Example
@@ -128,7 +128,7 @@ pars <- spec_rescomp(
     ks = crmatrix(1),
     n = crmatrix(2)
   ),
-  params = rescomp_param_list(
+  params = list(
     env_state = rescomp_param_square(period = 80)
   ),
   ressupply = ressupply_constant(0),

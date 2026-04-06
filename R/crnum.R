@@ -8,13 +8,17 @@
 #' @noRd
 #'
 #' @examples
-#' # TODO
+#' enforce_cnum(1:4, 4)
+#' enforce_rnum(1, 4)
+#' try(enforce_cnum(1:2, 4))
+#' enforce_crnum(matrix(1:12, nrow = 3, ncol = 4), 3, 4)
+#' try(enforce_crnum(matrix(1:12, nrow = 3, ncol = 4), 4, 3))
 enforce_crnum <- function(mat, spnum, resnum, call = rlang::caller_env()) {
   if (nrow(mat) != spnum || ncol(mat) != resnum) {
     cli::cli_abort(c(
       "Matrix dimensions do not match spnum and resnum.",
-      "x" = "Matrix had {nrow(mat)} row{?s} and {ncol(mat)} columns{?s}.",
-      "i" = "Expected {spnum} (spnum) row{?s} and {resnum} (resnum) columns{?s}."
+      "x" = "Matrix had {nrow(mat)} row{?s} and {ncol(mat)} column{?s}.",
+      "i" = "Expected {spnum} (spnum) row{?s} and {resnum} (resnum) column{?s}."
     ), call = call)
   } else {
     return(mat)
@@ -63,7 +67,12 @@ enforce_rnum <- function(vec, resnum, call = rlang::caller_env()) {
 #' @noRd
 #'
 #' @examples
-#' # TODO
+#' propagate_cnum(0, 4)
+#' propagate_rnum(1, 5)
+#' try(propagate_cnum(1:2, 3))
+#' propagate_crnum(crmatrix(1), 3, 4)$matrix
+#' propagate_crnum(crmatrix(1:12), 3, 4)$matrix
+#' try(propagate_crnum(matrix(1:12, nrow = 4, ncol = 3), 3, 4))
 propagate_crnum <- function(obj, spnum, resnum) {
   UseMethod("propagate_crnum")
 }

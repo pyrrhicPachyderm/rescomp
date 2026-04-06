@@ -6,9 +6,6 @@
 #'
 #' @returns S3 object of class `rescomp_event`.
 #' @noRd
-#'
-#' @examples
-#' # TODO
 event_introseq <- function(times, concentrations) {
   event <- list(times = times, concentrations = concentrations)
   class(event) <- c("rescomp_event_introseq", "rescomp_event")
@@ -35,7 +32,29 @@ apply_event.rescomp_event_introseq <- function(event_obj, species, resources, pa
 #' @export
 #'
 #' @examples
-#' # TODO
+#' m1 <- spec_rescomp(
+#'   spnum = 4, resnum = 4,
+#'   funcresp = funcresp_type1(crmatrix(
+#'     0.10, 0.05, 0.05, 0.05,
+#'     0.05, 0.10, 0.05, 0.05,
+#'     0.05, 0.05, 0.10, 0.05,
+#'     0.05, 0.05, 0.05, 0.10
+#'   )),
+#'   events = list(
+#'     event_schedule_periodic(
+#'       event_batch_transfer(dilution = 0.5, resources = 1),
+#'       period = 1000 / 16,
+#'       priority = 0
+#'     ),
+#'     event_set_introseq(
+#'       times = c(0, 250, 500, 750),
+#'       concentrations = c(10, 100, 1000, 2000),
+#'       priority = 1
+#'     )
+#'   ),
+#'   cinit = 0
+#' )
+#' plot_rescomp(sim_rescomp(m1))
 event_set_introseq <- function(times, concentrations, priority = 0) {
   schedule <- list(
     event_obj = event_introseq(times, concentrations),

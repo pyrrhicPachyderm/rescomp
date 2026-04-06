@@ -21,7 +21,11 @@
 #'
 #' @examples
 #' pars <- spec_rescomp()
-#' sim_rescomp(pars = pars)
+#' results1 <- sim_rescomp(pars = pars)
+#' plot_rescomp(results1)
+#'
+#' results2 <- sim_rescomp(pars = pars, totaltime = 100, cinit = 1000)
+#' plot_rescomp(results2)
 sim_rescomp <- function(pars, stochastic = FALSE, totaltime, cinit, rinit, ...) {
   # TODO: For parameters that override the values in `pars`, error-check them the same as spec_rescomp().
   # Write helper functions for error-checking that can be called both here and in spec_rescomp().
@@ -47,7 +51,7 @@ sim_rescomp <- function(pars, stochastic = FALSE, totaltime, cinit, rinit, ...) 
     if (nrow(pars$event_schedule_df) > 0) {
       events <- list(
         func = ode_event_func,
-        time = pars$event_schedule_df$time
+        time = unique(pars$event_schedule_df$time)
       )
     } else {
       events <- list()
