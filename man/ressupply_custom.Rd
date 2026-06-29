@@ -4,10 +4,12 @@
 \alias{ressupply_custom}
 \title{Create a resource supply rate using an arbitrary function}
 \usage{
-ressupply_custom(func, resnum = NULL)
+ressupply_custom(func, decrease_func = NULL, resnum = NULL)
 }
 \arguments{
 \item{func}{A function that takes \code{resources} (a numeric vector of resource concentrations) and \code{params} (a list of parameters) and returns a vector of rates of change of each resource.}
+
+\item{decrease_func}{A function as specified for \code{func}, save that the result is a rate of decrease for each resource (specified as a non-negative number).}
 
 \item{resnum}{The number of resources; the expected length of the \code{resources} argument to \code{func} and the length of the vector returned by \code{func}.}
 }
@@ -20,6 +22,9 @@ Produces an object suitable to pass as the \code{ressupply} to \code{spec_rescom
 \details{
 If \code{resnum} is NULL, \code{spec_rescomp()} will attempt to infer it.
 This is fine if the result is passed directly to \code{spec_rescomp()}, but may fail if the result must be combined with other \code{rescomp_ressupply} first.
+If performing stochastic simulation, it is required that \code{func} and \code{decrease_func} always return non-negative numbers, which are taken as the rates of positive and negative resource transitions.
+The total rate of change of resources is the difference between \code{func} and \code{decrease_func}.
+For non-stochastic simulation (or as long as resource supply is always non-negative), it suffices to specify the entire resource supply function in \code{func}, and leave \code{decrease_func} as NULL.
 }
 \examples{
 # Two resources, A and B, with constant supply of A, and A spontaneously converting to B

@@ -3,11 +3,15 @@
 #' Produces an object suitable to pass as the `ressupply` to `spec_rescomp()`.
 #'
 #' @param func A function that takes `resources` (a numeric vector of resource concentrations) and `params` (a list of parameters) and returns a vector of rates of change of each resource.
+#' @param decrease_func A function as specified for `func`, save that the result is a rate of decrease for each resource (specified as a non-negative number).
 #' @param resnum The number of resources; the expected length of the `resources` argument to `func` and the length of the vector returned by `func`.
 #'
 #' @details
 #' If `resnum` is NULL, `spec_rescomp()` will attempt to infer it.
 #' This is fine if the result is passed directly to `spec_rescomp()`, but may fail if the result must be combined with other `rescomp_ressupply` first.
+#' If performing stochastic simulation, it is required that `func` and `decrease_func` always return non-negative numbers, which are taken as the rates of positive and negative resource transitions.
+#' The total rate of change of resources is the difference between `func` and `decrease_func`.
+#' For non-stochastic simulation (or as long as resource supply is always non-negative), it suffices to specify the entire resource supply function in `func`, and leave `decrease_func` as NULL.
 #'
 #' @returns S3 object of class `rescomp_ressupply`.
 #' @export
@@ -22,8 +26,8 @@
 #'   resnum = 2
 #' )
 #' get_ressupply(ressupply, c(10, 20), list(supply = 3, conversion = 0.2))
-ressupply_custom <- function(func, resnum = NULL) {
-  ressupply <- list(func = func, resnum = resnum)
+ressupply_custom <- function(func, decrease_func = NULL, resnum = NULL) {
+  ressupply <- list(func = func, decrease_func = decrease_func, resnum = resnum)
   class(ressupply) <- c("rescomp_ressupply_custom", "rescomp_ressupply")
   return(ressupply)
 }
@@ -107,7 +111,10 @@ ressupply_chemostat <- function(dilution, concentration) {
 
 #' Get resource supply rates from a `rescomp_ressupply` object
 #'
-#' Gets the resource supply rates of each resource, given the current resource concentrations.
+#' `get_ressupply` gets the resource supply rates of each resource, given the current resource concentrations.
+#' It is simply the difference between the results of `get_ressupply_increase` and ``get_ressupply_decrease`.
+#' It is only important that increases and decreases are treated differently when performing stochastic simulations,
+#' as these are the independent rates of positive and negative transitions.
 #'
 #' This function is normally only for internal use, but is exported to aid users in debugging their created `rescomp_ressupply` objects.
 #'
@@ -133,10 +140,51 @@ get_ressupply <- function(ressupply_obj, resources, params) {
   UseMethod("get_ressupply")
 }
 
+#' @rdname get_ressupply
 #' @export
-get_ressupply.rescomp_ressupply_custom <- function(ressupply_obj, resources, params) {
+get_ressupply_increase <- function(ressupply_obj, resources, params) {
+  UseMethod("get_ressupply_increase")
+}
+
+#' @rdname get_ressupply
+#' @export
+get_ressupply_decrease <- function(ressupply_obj, resources, params) {
+  UseMethod("get_ressupply_decrease")
+}
+
+#' @export
+get_ressupply.default <- function(ressupply_obj, resources, params) {
+  return(get_ressupply_increase(ressupply_obj, resources, params) - get_ressupply_decrease(ressupply_obj, resources, params))
+}
+
+#' @export
+get_ressupply_increase.default <- function(ressupply_obj, resources, params) {
+  vec <- get_ressupply(ressupply_obj, resources, params)
+  vec[vec < 0] <- 0
+  return(vec)
+}
+
+#' @export
+get_ressupply_decrease.default <- function(ressupply_obj, resources, params) {
+  vec <- get_ressupply(ressupply_obj, resources, params)
+  vec[vec > 0] <- 0
+  return(vec)
+}
+
+#' @export
+get_ressupply_increase.rescomp_ressupply_custom <- function(ressupply_obj, resources, params) {
   vec <- ressupply_obj$func(resources, params)
   check_coefs(vec, length(resources), "`func` of `ressupply_custom`", "resnum")
+  return(vec)
+}
+
+#' @export
+get_ressupply_decrease.rescomp_ressupply_custom <- function(ressupply_obj, resources, params) {
+  if (is.null(ressupply_obj$decrease_func)) {
+    return(0)
+  }
+  vec <- ressupply_obj$decrease_func(resources, params)
+  check_coefs(vec, length(resources), "`decrease_func` of `ressupply_custom`", "resnum")
   return(vec)
 }
 
@@ -147,16 +195,23 @@ get_ressupply.rescomp_ressupply_constant <- function(ressupply_obj, resources, p
 
 #' @export
 get_ressupply.rescomp_ressupply_logistic <- function(ressupply_obj, resources, params) {
+  # TODO: I'm sure there's a way to describe logistic growth appropriately as separate birth and death rates, for get_ressupply_increase and get_ressupply_decrease.
   r <- get_coefs_vector(ressupply_obj$r, params)
   k <- get_coefs_vector(ressupply_obj$k, params)
   return(r * resources * (1 - resources / k))
 }
 
 #' @export
-get_ressupply.rescomp_ressupply_chemostat <- function(ressupply_obj, resources, params) {
+get_ressupply_increase.rescomp_ressupply_chemostat <- function(ressupply_obj, resources, params) {
   dilution <- get_coefs_vector(ressupply_obj$dilution, params)
   concentration <- get_coefs_vector(ressupply_obj$concentration, params)
-  return(dilution * (concentration - resources))
+  return(dilution * concentration)
+}
+
+#' @export
+get_ressupply_decrease.rescomp_ressupply_chemostat <- function(ressupply_obj, resources, params) {
+  dilution <- get_coefs_vector(ressupply_obj$dilution, params)
+  return(dilution * resources)
 }
 
 #' @export

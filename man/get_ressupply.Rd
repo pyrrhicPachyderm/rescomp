@@ -2,9 +2,15 @@
 % Please edit documentation in R/ressupply.R
 \name{get_ressupply}
 \alias{get_ressupply}
+\alias{get_ressupply_increase}
+\alias{get_ressupply_decrease}
 \title{Get resource supply rates from a \code{rescomp_ressupply} object}
 \usage{
 get_ressupply(ressupply_obj, resources, params)
+
+get_ressupply_increase(ressupply_obj, resources, params)
+
+get_ressupply_decrease(ressupply_obj, resources, params)
 }
 \arguments{
 \item{ressupply_obj}{An object of class \code{rescomp_funcresp}.}
@@ -17,7 +23,10 @@ get_ressupply(ressupply_obj, resources, params)
 A vector of rates of change of resource concentrations, of the same length as \code{resources}.
 }
 \description{
-Gets the resource supply rates of each resource, given the current resource concentrations.
+\code{get_ressupply} gets the resource supply rates of each resource, given the current resource concentrations.
+It is simply the difference between the results of \code{get_ressupply_increase} and ``get_ressupply_decrease`.
+It is only important that increases and decreases are treated differently when performing stochastic simulations,
+as these are the independent rates of positive and negative transitions.
 }
 \details{
 This function is normally only for internal use, but is exported to aid users in debugging their created \code{rescomp_ressupply} objects.
