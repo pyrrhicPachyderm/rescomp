@@ -69,14 +69,17 @@ def_cr_transitions <- function(pars) {
     return(setNames(values, names))
   })
 
-  ressupply <- lapply(1:pars$resnum, function(i) {
+  ressupply_increase <- lapply(1:pars$resnum, function(i) {
     names <- res_indices[i]
     values <- 1
     return(setNames(values, names))
   })
 
-  # TODO: It will be necessary to split ressupply into an addition and subtraction component, as the Gillespie algorithm does not allow for negative rates of positive transitions.
-  # This can't be done here alone; this will require a fundamental change to the ressupply logic.
+  ressupply_decrease <- lapply(1:pars$resnum, function(i) {
+    names <- res_indices[i]
+    values <- -1
+    return(setNames(values, names))
+  })
 
   extra_terms <- lapply(pars$extra_terms, function(extra_term) {
     names <- c(sp_indices, res_indices)
@@ -84,7 +87,7 @@ def_cr_transitions <- function(pars) {
     return(setNames(values, names))
   })
 
-  return(c(growth, death, ressupply, extra_terms))
+  return(c(growth, death, ressupply_increase, ressupply_decrease, extra_terms))
 }
 
 # TODO: We have an additional problem with the use of adaptivetau.
@@ -112,7 +115,8 @@ def_cr_transition_rates <- function(y, pars, t) {
   params <- get_params(pars$params, t)
 
   mu <- get_funcresp(pars$funcresp, pars$spnum, R, params)
-  ressupply <- get_ressupply(pars$ressupply, R, params)
+  ressupply_increase <- get_ressupply_increase(pars$ressupply, R, params)
+  ressupply_decrease <- get_ressupply_decrease(pars$ressupply, R, params)
   if (is.null(pars$efficiency)) {
     efficiency <- 1
   } else {
@@ -135,7 +139,7 @@ def_cr_transition_rates <- function(y, pars, t) {
     return(extra_term$rate(N, R, total_growth))
   }))
 
-  return(c(growth, death, ressupply, extra_terms))
+  return(c(growth, death, ressupply_increase, ressupply_decrease, extra_terms))
 }
 
 #' Run a tau-leaping simulation, adjusting times appropriately.
